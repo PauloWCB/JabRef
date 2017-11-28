@@ -1,6 +1,5 @@
 package org.jabref.shared;
 
-import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.Objects;
 import java.util.Optional;
@@ -24,7 +23,6 @@ public class DBMSConnectionProperties {
     private String database;
     private String user;
     private String password;
-
 
     public DBMSConnectionProperties() {
         // no data
@@ -95,12 +93,28 @@ public class DBMSConnectionProperties {
     /**
      * Compares all properties except the password.
      */
-    public boolean equals(DBMSConnectionProperties properties) {
-        return this.type.equals(properties.getType())
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if ((o == null) || (getClass() != o.getClass())) {
+            return false;
+        }
+
+        DBMSConnectionProperties properties = (DBMSConnectionProperties) o;
+
+        return Objects.equals(this.type, properties.type)
                 && this.host.equalsIgnoreCase(properties.getHost())
-                && (this.port == properties.getPort())
-                && this.database.equals(properties.getDatabase())
-                && this.user.equals(properties.getUser());
+                && Objects.equals(this.port, properties.port)
+                && Objects.equals(this.database, properties.database)
+                && Objects.equals(this.user, properties.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(host, port, database, user);
     }
 
     /**
@@ -123,7 +137,7 @@ public class DBMSConnectionProperties {
             if (prefs.getPassword().isPresent()) {
                 try {
                     this.password = new Password(prefs.getPassword().get().toCharArray(), prefs.getUser().get()).decrypt();
-                } catch (UnsupportedEncodingException | GeneralSecurityException e) {
+                } catch (GeneralSecurityException e) {
                     LOGGER.error("Could not decrypt password", e);
                 }
             }
