@@ -1,0 +1,4 @@
+class Printer
+{
+public Printer(){}
+}
